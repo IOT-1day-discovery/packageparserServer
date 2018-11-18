@@ -5,6 +5,9 @@
 
 .DS_Store
 
+#our database
+DbStore/
+
 # User-specific files
 *.rsuser
 *.suo
