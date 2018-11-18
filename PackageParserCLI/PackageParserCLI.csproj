@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <ProjectGuid>{7647809A-B5A1-4419-943B-0EED4EEC50FC}</ProjectGuid>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>PackageParserCLI</RootNamespace>
+    <AssemblyName>PackageParserCLI</AssemblyName>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="PackageCollection.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.11.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System">
+      <HintPath>..\..\..\..\..\Library\Frameworks\Mono.framework\Versions\5.12.0\lib\mono\4.7-api\System.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PackageParserWeb\PackageParserWeb.csproj">
+      <Project>{8E22D7D5-FE40-479F-9167-CECB8A7E7336}</Project>
+      <Name>PackageParserWeb</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="resources\compressedPackages\artful-amd64.gz" />
+    <None Include="resources\compressedPackages\artful-i386.gz" />
+    <None Include="resources\compressedPackages\bionic-amd64.gz" />
+    <None Include="resources\compressedPackages\bionic-i386.gz" />
+    <None Include="resources\compressedPackages\cosmic-amd64.gz" />
+    <None Include="resources\compressedPackages\cosmic-i386.gz" />
+    <None Include="resources\compressedPackages\devel-amd64.gz" />
+    <None Include="resources\compressedPackages\devel-i386.gz" />
+    <None Include="resources\compressedPackages\disco-amd64.gz" />
+    <None Include="resources\compressedPackages\disco-i386.gz" />
+    <None Include="resources\compressedPackages\precise-amd64.gz" />
+    <None Include="resources\compressedPackages\precise-i386.gz" />
+    <None Include="resources\compressedPackages\raspbian-buster-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-jessie-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-oldoldstable-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-oldstable-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-stable-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-stretch-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-testing-armhf.gz" />
+    <None Include="resources\compressedPackages\raspbian-wheezy-armhf.gz" />
+    <None Include="resources\compressedPackages\trusty-amd64.gz" />
+    <None Include="resources\compressedPackages\trusty-i386.gz" />
+    <None Include="resources\compressedPackages\xenial-amd64.gz" />
+    <None Include="resources\compressedPackages\xenial-i386.gz" />
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+</Project>
