@@ -5,7 +5,7 @@ const zlib = require("zlib");
 const path = require("path");
 const exec = require('child_process').exec;
 
-const writeDir = "packages";
+const writeDir = "compressedPackages";
 
 class FetchPackages {
     urlConstructior(distro, arch) {
@@ -25,17 +25,21 @@ class FetchPackages {
         }
     }
 
+    fetchAllFilesHelper(distro) {
+        for (let arch of this.archs) {
+            let url = this.urlConstructior(distro, arch);
+            let fileName = this.fileNameConstructor(distro, arch);
+            let tarPath = `${writeDir}/${fileName}.gz`;
+            this.downloadFile(tarPath, url);
+            if (this.shouldWriteToFile && fs.existsSync(tarPath)) {
+                this.unzip(tarPath,`${writeDir}/${fileName}.txt`);
+            }
+        }
+    }
+
     fetchAllFiles() {
         for (let distro of this.distros) {
-            for (let arch of this.archs) {
-                let url = this.urlConstructior(distro, arch);
-                let fileName = this.fileNameConstructor(distro, arch);
-                let tarPath = `${writeDir}/${fileName}.gz`;
-                this.downloadFile(tarPath, url);
-                if (this.shouldWriteToFile && fs.existsSync(tarPath)) {
-                    this.unzip(tarPath,`${writeDir}/${fileName}.txt`);
-                }
-            }
+            this.fetchAllFilesHelper(distro);
         }
     }
 
@@ -79,6 +83,44 @@ class UbuntuPackages extends FetchPackages {
     }
 }
 
+class DebianPackages extends FetchPackages {
+    constructor() {
+        super();
+        this.shouldWriteToFile = false;
+        this.httpImpl = http;
+        this.baseUrl = "http://archive.debian.org/debian/dists/";
+        this.distros = ["Debian-6.0","Debian-5.0","Debian-4.0",
+                        "Debian-3.1", "Debian-3.0","Debian-2.2",
+                        "Debian-2.1", "Debian-2.0","Debian-1.3.1",
+                        "Debian-1.2", "Debian-1.1"
+
+                       ];
+        this.archsByDistro = { 
+            "Debian-6.0": ["amd64", "i386", "armel", "ia64","mips","mipsel", "powerpc","s390", "sparc"],
+            "Debian-5.0": ["amd64", "i386", "arm", "ia64","mips","mipsel", "powerpc","s390", "sparc"],
+            "Debian-4.0": ["amd64", "i386", "arm", "ia64","mips","mipsel", "powerpc","s390", "sparc"],
+            "Debian-3.1": ["i386", "arm", "ia64","mips","mipsel", "powerpc","s390", "sparc"],
+            "Debian-3.0": ["i386", "arm", "ia64","mips","mipsel", "powerpc","s390", "sparc"],
+            "Debian-2.2": ["i386", "arm", "powerpc","sparc"],
+            "Debian-2.1": ["i386", "sparc"],
+            "Debian-2.0": ["i386"],
+            "Debian-1.3.1":["i386"],
+            "Debian-1.2":["i386"],
+            "Debian-1.1":["i386"]
+                    };
+        this.archs = [];
+        this.arcPrefix = "/main/binary-";
+        this.fileToFetch = "Packages.gz";
+    }
+    fetchAllFiles() {
+        for (let distro of this.distros) {
+            this.archs = this.archsByDistro[distro];
+            //console.log(this.archs);
+            super.fetchAllFilesHelper(distro);
+        }
+    }
+}
+
 function promiseFromChildProcess(child) {
     return new Promise(function(resolve, reject) {
         child.addListener('error', reject);
@@ -112,6 +154,8 @@ function run(command) {
 }
 let rp = new RasbianPackages();
 let up = new UbuntuPackages();
+let dp = new DebianPackages();
 rp.fetchAllFiles();
 up.fetchAllFiles();
+dp.fetchAllFiles();
 //runJsonConversion();
