@@ -7,15 +7,61 @@ const exec = require('child_process').exec;
 
 const writeDir = "compressedPackages";
 
+/**
+ * @class FetchPackages
+ *  @description a base class that defines the scafolding for downloading and storing packages
+ */
 class FetchPackages {
+    /**
+     * @property {string} baseUrl -The base url where a package is located
+     */
+
+    /**
+     * @property {string} arcPrefix- The specific archtecture you want to fetch.
+     */
+
+    /**
+     * @property {string} fileToFetch- The specific file you want to fetch.
+     */
+
+    /**
+     * @property {Boolean} shouldWriteToFile - boolean to determine if extracted file should be written.
+     */
+
+    /** 
+     *  @property {http|https} httpImpl - specific http type to use.
+     */
+    /** 
+     * @property {Array<string>} archs  architectures supported by distro.
+     */
+    /** 
+     * @property {Array<string>} distros  codenames supported
+     */
+
+    /**
+     * A function that contstructs the url.
+     * @param {string} distro a string representing the distribution
+     * @param {string} arch  a string representing the cpu architecture.
+     * @return {string} the url we will download files from
+     */
     urlConstructior(distro, arch) {
         return `${this.baseUrl}${distro}${this.arcPrefix}${arch}/${this.fileToFetch}`
     }
 
+    /**
+     * constructs the name of the file we will create.
+     * @param {string} distro a string representing the distribution
+     * @param {string} arch  a string representing the cpu architecture.
+     */
     fileNameConstructor(distro, arch) {
         return `${distro}-${arch}`
     }
 
+    /**
+     * A function that sets up and http to write stream.
+     * @param {string} fileName The name of the file to write to.
+     * @param {string} url The URL to download from.
+     */
     downloadFile(fileName, url) {
         if (!fs.existsSync(fileName)) {
             let file = fs.createWriteStream(fileName);
@@ -25,6 +71,10 @@ class FetchPackages {
         }
     }
 
+    /**
+     * A funtion that helps with the downloading of Package.gz files.
+     * @param {string} distro a string representing the distribution
+     */
     fetchAllFilesHelper(distro) {
         for (let arch of this.archs) {
             let url = this.urlConstructior(distro, arch);
@@ -36,13 +86,20 @@ class FetchPackages {
             }
         }
     }
-
+    /**
+     * Iterates through all distro and calls a helper to dowload specified files.
+     */
     fetchAllFiles() {
         for (let distro of this.distros) {
             this.fetchAllFilesHelper(distro);
         }
     }
 
+    /**
+     * function to decompress zlib compressed files.
+     * @param {string} tarballPath path the file we want to decompress
+     * @param {string} dstPath path to where we want to write this file.
+     */
     unzip(tarballPath, dstPath) {
         fs.createReadStream(tarballPath)
             .on('error', console.error)
@@ -52,7 +109,14 @@ class FetchPackages {
     }
 }
 
+/**
+ * @class RasbianPackages
+ *  @description a class that fetches rasbian package.gz files
+ */
 class RasbianPackages extends FetchPackages {
+    /**
+     * constructor for RasbianPackages
+     */
     constructor() {
         super();
         this.shouldWriteToFile = false;
@@ -64,12 +128,24 @@ class RasbianPackages extends FetchPackages {
         this.arcPrefix = "/main/binary-";
         this.fileToFetch = "Packages.gz";
     }
+    /**
+     * override of fileNameConstructor adds rasbian specific prefix.
+     * @param {string} distro a string representing the distribution
+     * @param {string} arch  a string representing the cpu architecture.
+     */
     fileNameConstructor(distro, arch) {
         return `raspbian-${super.fileNameConstructor(distro,arch)}`;
     }
 }
 
+/**
+ * @class UbuntuPackages
+ *  @description a class that fetches ubuntu package.gz files
+ */
 class UbuntuPackages extends FetchPackages {
+    /**
+     * constructor for UbuntuPackages
+     */
     constructor() {
         super();
         this.shouldWriteToFile = false;
@@ -83,7 +159,14 @@ class UbuntuPackages extends FetchPackages {
     }
 }
 
+/**
+ * @class DebianPackages
+ *  @description a class that fetches debian package.gz files
+ */
 class DebianPackages extends FetchPackages {
+    /**
+     * constructor for DebianPackages
+     */
     constructor() {
         super();
         this.shouldWriteToFile = false;
@@ -112,6 +195,10 @@ class DebianPackages extends FetchPackages {
         this.arcPrefix = "/main/binary-";
         this.fileToFetch = "Packages.gz";
     }
+    /**
+     * override fetchAllFiles w\o any supper calls to account for
+     * different arch dependencies by distro version.
+     */
     fetchAllFiles() {
         for (let distro of this.distros) {
             this.archs = this.archsByDistro[distro];
@@ -121,6 +208,10 @@ class DebianPackages extends FetchPackages {
     }
 }
 
+/**
+ * A function that attaches promise semantics to a child process api.
+ * @param {child_process} child api that we want to convert the callback to a promise.
+ */
 function promiseFromChildProcess(child) {
     return new Promise(function(resolve, reject) {
         child.addListener('error', reject);
@@ -128,6 +219,10 @@ function promiseFromChildProcess(child) {
     });
 }
 
+/**
+ * A function for running shell commands like wget and tar.
+ * @param {string} command we want to execute in a shell.
+ */
 function run(command) {
     let proc = exec(command);
     proc.stdout.on('data', function(stdout) {
@@ -139,6 +234,9 @@ function run(command) {
       return promiseFromChildProcess(proc);
 }
 
+/**
+ * function that calls a ruby file that converts a package.gz file into a json file.
+ */
   async function runJsonConversion() {
     let files = fs.readdirSync(writeDir);
     let targetFiles = files.filter(function(file) {

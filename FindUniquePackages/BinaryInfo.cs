@@ -4,6 +4,10 @@ using Newtonsoft.Json;
 
 namespace FindUniquePackages
 {
+    /// <summary>
+    /// An object representation of what we fetch from a csv
+    /// and then serialize to json for mongodb importation.
+    /// </summary>
     public class BinaryInfo
     {
         public readonly String filepath;
@@ -33,6 +37,10 @@ namespace FindUniquePackages
         public readonly String bits;
         [JsonProperty("sha1")]
         public readonly String file_sha1;
+
+        /// <summary>
+        /// constructor for BinaryInfo
+        /// </summary>
         public BinaryInfo(String[] initArr){
             filepath = initArr[0];
             machine = initArr[1];
@@ -49,12 +57,22 @@ namespace FindUniquePackages
             bits = initArr[12];
             file_sha1 = initArr[13];
         }
-
+        /// <summary>
+        /// a hashcode override that uses the sha1 string.
+        /// </summary>
+        /// <returns>
+        /// the hashcode of the sha1 string.
+        /// </returns>
         public override int GetHashCode() {
             //return int.Parse(this.file_sha1, NumberStyles.HexNumber);
             return this.file_sha1.GetHashCode();
         }
-
+        /// <summary>
+        /// a Equals override that checks equality of sha1 strings
+        /// </summary>
+        /// <returns>
+        /// the boolean evaluation of sha1 comparisons
+        /// </returns>
         public override bool Equals(object obj)
         {
             return obj is BinaryInfo && (this.file_sha1 == ((BinaryInfo)obj).file_sha1);

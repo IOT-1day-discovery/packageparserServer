@@ -345,17 +345,9 @@ async function InvokeIpkDownload(fetchTheseIpks=null) {
 }
 
 /**
- * A function that attaches promise semantics to a stream callback api.
- * @param {stream} stream api that we want to convert the callback to a promise.
+ * A function that attaches promise semantics to a child process api.
+ * @param {child_process} child api that we want to convert the callback to a promise.
  */
-function attachPromise(stream) {
-    return new Promise((resolve, reject) => {
-        stream.on("finish", () => { resolve(true); }); 
-        stream.on("error", reject);
-    });
-  }
-
-
 function promiseFromChildProcess(child) {
     return new Promise(function(resolve, reject) {
         child.addListener('error', reject);
@@ -363,6 +355,11 @@ function promiseFromChildProcess(child) {
     });
 }
 
+/**
+ * A function for running shell commands like wget and tar.
+ * @param {string} command we want to execute in a shell.
+ * @param {Array<string>} outArr where we want to store the output of the command we invoked.
+ */
 function run(command,outArr=null) {
     let proc = exec(command);
     if(proc.stdout == undefined) {
@@ -402,6 +399,11 @@ async function removeZeroByteFilesMac() {
     await run(`find . -type f -size 0 -exec rm -f '{}' +`);
 }*/
 
+/**
+ * A function to generate checksums on files.
+ * @param {string} algorithm The algorithm is dependent on the available algorithms supported by the version of OpenSSL on the platform. 
+ * @param {*} path the file we want to generate a checksum for.
+ */
 function checksumFile(algorithm, path) {
     return new Promise((resolve, reject) =>
       fs.createReadStream(path)
@@ -412,8 +414,12 @@ function checksumFile(algorithm, path) {
           resolve(this.read())
         })
     )
-  }
+}
 
+/**
+ * A function that ill extract an ipk and hash its binary hierarchy. 
+ * @param {string} ipkFile The ipk file we want to extract.
+ */
 async function extractIpk(ipkFile) {
     let lastIndexOfSlash = ipkFile.lastIndexOf('/');
     let fileName = ipkFile.substring(lastIndexOfSlash +1,ipkFile.length-5);
@@ -453,7 +459,12 @@ async function extractIpk(ipkFile) {
     //console.log(returnObj);
     return returnObj;
 }
-
+/**
+ * A function that invokes a filesystem walk of downloaded ipks.
+ * Then extracts the ipks and computes the sha1 hash of each binary.
+ * Bars will show your progress from walking the filesystem to extracting files
+ * to finally write out a json file that can be imported into mongodb.
+ */
 async function walkAndComputeHashes() {
     const bar1 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
     const bar2 = new _cliProgress.Bar({}, _cliProgress.Presets.shades_classic);
@@ -506,6 +517,15 @@ async function walkAndComputeHashes() {
     transformWriteStream.end();
 }
 
+/**
+ * A recursive function that walks the directory.
+ * @param {string} dir directory we want to walk.
+ * @param {Function} actionFunc function we want to run on each file found.
+ * @param {Array} filelist an ouput parameter of the entire file hierarchy
+ *  of the given directory to start walking at.
+ * @return {Array} returns the files found at a particular directory level.
+ * Intent was for this to only be used by the filesystem walk.
+ */
 const walkFs = (dir, actionFunc=null, filelist = []) => {
     const files = fs.readdirSync(dir);
     for (const file of files) {
@@ -534,6 +554,9 @@ const walkFs = (dir, actionFunc=null, filelist = []) => {
     return filelist;
   };
 
+/**
+ * Entrypoint for fetch.js
+ */
 async function downloadAndComputeHashes() {
     await InvokeIpkDownload();
     //InvokeIpkDownload(['barrier_breaker/14.07/ramips/rt3883/packages/packages/']);

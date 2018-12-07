@@ -9,20 +9,36 @@ using PackageParserWeb.Database;
 
 namespace PackageParserCLI
 {
+    /// <summary>
+    /// static class 
+    /// </summary>
     public static class PackageStoreHelper
     {
         public delegate void AddPackage(PackageEntry pe);
 
+        /// <summary>
+        /// A function that takes a stream and writes to the mongodb database.
+        /// </summary>
         public static void FromStreamToDb(Stream zip) {
             FromStream(zip, PackageDb.Instance.AddPackageAsync);
         }
 
+        /// <summary>
+        /// A function that takes a stream and writes to a list.
+        /// used for debugging.
+        /// </summary>
+        ///<returns>
+        /// returns the json serialized package as a string.
+        ///</returns>
         public static string FromStreamToList(Stream zip) {
             List<PackageEntry> packages = new List<PackageEntry>();
             FromStream(zip, packages.Add);
             return JsonConvert.SerializeObject(packages.ToArray());
         }
 
+        /// <summary>
+        /// JSON parser for package.gz files.
+        /// </summary>
         public static void FromStream(Stream zip, AddPackage funcAdd)
         {
             using (StreamReader unzip = new StreamReader(zip))

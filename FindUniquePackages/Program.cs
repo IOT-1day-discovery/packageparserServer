@@ -8,12 +8,18 @@ using System.Collections;
 
 namespace FindUniquePackages
 {
+    /// <summary>
+    /// static class 
+    /// </summary>
     public static class Program
     {
         static Dictionary<string, List<BinaryInfo>> filesystemToBinaryInfo = new Dictionary<string, List<BinaryInfo>>();
         static Dictionary<string, HashSet<BinaryInfo>> binaryNameToBinaryInfo = new Dictionary<string, HashSet<BinaryInfo>>();
         //static HashSet<BinaryInfo> binarySet = new HashSet<BinaryInfo>();
 
+        /// <summary>
+        /// builds a file system map to its binaries. 
+        /// </summary>
         public static void addToFileSystemMap(BinaryInfo bi)
         {
             int indexOfSlash = bi.filepath.IndexOf('/');
@@ -37,6 +43,13 @@ namespace FindUniquePackages
             }
         }
 
+        /// <summary>
+        /// builds a similarity matrix of  filesystems.
+        /// NOTE: don't use  when too many filesystems
+        /// </summary>
+        /// <returns>
+        /// returns the json serialized version of the matrix.
+        /// </returns>
         public static string generateSimilarityMatrix() {
 
             double[,] similarityMat = new double[filesystemToBinaryInfo.Count,filesystemToBinaryInfo.Count];
@@ -68,9 +81,11 @@ namespace FindUniquePackages
             }
 
             return JsonConvert.SerializeObject(similarityMat);
-
-
         }
+
+        /// <summary>
+        /// specialized add for binaryNameToBinaryInfo.
+        /// </summary>
         public static void addToBinaryNameMap(BinaryInfo bi)
         {
             int lastIndexOfSlash = bi.filepath.LastIndexOf('/');
@@ -87,11 +102,20 @@ namespace FindUniquePackages
             }
         }
 
+        /// <summary>
+        /// The needed serialization transform to have named key and value types.
+        /// </summary>
+        /// <return>
+        /// returns an enumerable type conversion of a Dictionary.
+        /// </return>
         public static IEnumerable serializationTransform<K,V>(Dictionary<K,V> aDict) {
             return from key in aDict.Keys
                                     select new { k = key, v = aDict[key] };
         }
 
+
+        /// Main function that decompresses a xz file and serialized it 
+        // into a json for mongodb storage.
         public static void Main(string[] args)
         {
             if (args.Length != 1)

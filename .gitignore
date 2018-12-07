@@ -8,6 +8,9 @@
 #our database
 DbStore/
 
+#user-specific text editor
+.vscode/
+
 # User-specific files
 *.rsuser
 *.suo

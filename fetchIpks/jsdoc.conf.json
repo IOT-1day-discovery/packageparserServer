@@ -4,7 +4,7 @@
               "plugins/summarize"
       ],
       "source": {
-              "include": ["fetch.js", "README.md"]
+              "include": ["fetch.js","fetchPackages.js", "README.md"]
       },
       "opts": {
               "destination": "./output/Docs",

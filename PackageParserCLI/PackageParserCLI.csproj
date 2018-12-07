@@ -44,34 +44,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="resources\compressedPackages\artful-amd64.gz" />
-    <None Include="resources\compressedPackages\artful-i386.gz" />
-    <None Include="resources\compressedPackages\bionic-amd64.gz" />
-    <None Include="resources\compressedPackages\bionic-i386.gz" />
-    <None Include="resources\compressedPackages\cosmic-amd64.gz" />
-    <None Include="resources\compressedPackages\cosmic-i386.gz" />
-    <None Include="resources\compressedPackages\devel-amd64.gz" />
-    <None Include="resources\compressedPackages\devel-i386.gz" />
-    <None Include="resources\compressedPackages\disco-amd64.gz" />
-    <None Include="resources\compressedPackages\disco-i386.gz" />
-    <None Include="resources\compressedPackages\precise-amd64.gz" />
-    <None Include="resources\compressedPackages\precise-i386.gz" />
-    <None Include="resources\compressedPackages\raspbian-buster-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-jessie-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-oldoldstable-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-oldstable-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-stable-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-stretch-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-testing-armhf.gz" />
-    <None Include="resources\compressedPackages\raspbian-wheezy-armhf.gz" />
-    <None Include="resources\compressedPackages\trusty-amd64.gz" />
-    <None Include="resources\compressedPackages\trusty-i386.gz" />
-    <None Include="resources\compressedPackages\xenial-amd64.gz" />
-    <None Include="resources\compressedPackages\xenial-i386.gz" />
-    <None Include="resources\searchspace\Contents-amd64" />
-    <None Include="resources\searchspace\filesystem.elffiles.sha1sums.csv" />
-    <None Include="resources\searchspace\filesystem.elffiles.sha1sums_1M" />
-    <None Include="resources\searchspace\filesystem.execfiles_detailed.csv" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />

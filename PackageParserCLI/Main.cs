@@ -3,8 +3,13 @@ using System.IO.Compression;
 
 namespace PackageParserCLI
 {
+    /// <summary>
+    /// static class 
+    /// </summary>
     public static class MainClass
     {
+        /// Main function that decompreses package files into a stream and invokes
+        /// a write to the mongodb database.
         public static void Main(string[] args) {
 
             string folderPath = Directory.GetCurrentDirectory() +
