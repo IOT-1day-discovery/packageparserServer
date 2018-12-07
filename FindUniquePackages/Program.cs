@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using SharpCompress.Compressors.Xz;
 using Newtonsoft.Json;
+using System.Linq;
+using System.Collections;
 
 namespace FindUniquePackages
 {
@@ -85,6 +87,11 @@ namespace FindUniquePackages
             }
         }
 
+        public static IEnumerable serializationTransform<K,V>(Dictionary<K,V> aDict) {
+            return from key in aDict.Keys
+                                    select new { k = key, v = aDict[key] };
+        }
+
         public static void Main(string[] args)
         {
             if (args.Length != 1)
@@ -109,13 +116,13 @@ namespace FindUniquePackages
                         string[] lines = line.Split(';');
                         BinaryInfo bi = new BinaryInfo(lines);
                         //binarySet.Add(bi);
-                        addToFileSystemMap(bi);
+                        //addToFileSystemMap(bi);
                         addToBinaryNameMap(bi);
                     }
                 }
             }
-            File.WriteAllText("FileSystemBinaries.json", JsonConvert.SerializeObject(filesystemToBinaryInfo));
-            //File.WriteAllText("BinaryVariations.json", JsonConvert.SerializeObject(binaryNameToBinaryInfo));
+            //File.WriteAllText("FileSystemBinaries.json", JsonConvert.SerializeObject(serializationTransform(filesystemToBinaryInfo)));
+            File.WriteAllText("BinaryVariations.json", JsonConvert.SerializeObject(serializationTransform(binaryNameToBinaryInfo)));
             //File.WriteAllText("SimilarityArray.json", generateSimilarityMatrix());
         }
     }

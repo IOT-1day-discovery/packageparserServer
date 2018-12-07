@@ -1,4 +1,4 @@
-//'use strict';
+'use strict';
 const http = require('http');
 const fs = require('fs');
 const util = require('util');
@@ -12,6 +12,11 @@ const _cliProgress = require('cli-progress');
 const  baseUrl = 'http://archive.openwrt.org/' 
 const cacheFoundStr = "cache found for: "
 
+/**
+ * A function that reads in the table at the baseUrl for code names.
+ * This function will cache results to codeNames-cache.json
+ * @return {Array<string>} this function returns an array of codnames.
+ */
 async function InvokeCodeNamesSetter() {
     let fileName = "codeNames";
     let  codeNames = await readFile("codeNames");
@@ -34,7 +39,11 @@ async function InvokeCodeNamesSetter() {
     await writeFile(fileName,codeNames);
     return codeNames;
 }
-
+/**
+ * A function that reads in the table at the version url to produce a list of versions.
+ * values are cached at versionTypes-cache.json.
+ * @return {Array<string>} returns an array of version number offset addresses
+ */
 async function InvokeVersionsSetter() {
     let fileName = "versionTypes";
     let offSetUrls = await readFile(fileName);
@@ -59,6 +68,11 @@ async function InvokeVersionsSetter() {
     return offSetUrls;
 }
 
+/**
+ * This function builds up the architectures portion of our URL.
+ * @param {Array<String>} filterArr this array reduces the architecures we will build url links for.
+ * @return {Array<String>} returns the url list with arch included.
+ */
 async function InvokeArchSetter(filterArr) {
     let fileName = "archOffsets";
     let offSetUrls = await readFile(fileName);
@@ -103,6 +117,10 @@ async function InvokeArchSetter(filterArr) {
     return offSetUrls;
 }
 
+/**
+ * Each Architecture can also have flavors so this invocation handles those.
+ * @return {Array<String>} returns the url offset list that includes specific chipset info.
+ */
 async function InvokeArchTypes() {
     let fileName = "archTypes";
     let offSetUrls = await readFile(fileName);
@@ -138,6 +156,13 @@ async function InvokeArchTypes() {
     await writeFile(fileName,offSetUrls);
     return offSetUrls;
 }
+/**
+ * A function that generates a list of every ipk file's url offset.
+ * @param {Array<string>} fetchTheseIpks - if you know which ipks you want 
+ * ahead of time you can specify it here and we won't build up a hierarchical list.
+ * @return {Array<string>} returns a list of every ipk url offset in the hierarchy.
+ * 
+ */
 async function InvokeIpkFetch(fetchTheseIpks=null) {
     let fileName = "ipks";
     let offSetUrls = [];
@@ -186,7 +211,11 @@ async function InvokeIpkFetch(fetchTheseIpks=null) {
     await writeFile(fileName,offSetUrls);
     return offSetUrls;
 }
-
+/**
+ * a function that will create a directory one up from the given path.
+ * @param {string} filePath pass in a path to a file. we will make the directory
+ *  one-level up.
+ */
 async function mkDir(filePath) {
     let dirPath = `./${path.dirname(filePath)}`;
     if (!fs.existsSync(dirPath)) {
@@ -199,7 +228,11 @@ async function mkDir(filePath) {
         }
     }
 }
-
+/**
+ * A function that writes to a file.
+ * @param {string} filePath path to write file.
+ * @param {Array} writeArr array we will serialize to JSON.
+ */
 async function writeChunk(filePath, writeArr) {
     const writeFile = utilPromisify(fs.writeFile);
     try {
@@ -209,7 +242,11 @@ async function writeChunk(filePath, writeArr) {
         throw new Error('Failed to write to disk.');
     }
 }
-
+/**
+ * A streamable write and json serialization function.
+ * @param {string} filePath path to write file.
+ * @param {Array} writeArr array we will serialize to JSON.
+ */
 function writeStream(filePath, writeArr) {
     let outputStream = fs.createWriteStream(filePath);
     let transformWriteStream = JSONStream.stringify();
@@ -217,7 +254,12 @@ function writeStream(filePath, writeArr) {
     transformWriteStream.write(writeArr);
     transformWriteStream.end();
 }
-
+/**
+ * 
+ * @param {string} filePath path to write file.
+ * @param {Array} writeArr array we will serialize to JSON.
+ * @param {Boolean} asStream Toggle between streamable and non streamable writes.
+ */
 async function writeFile(fileName, writeArr, asStream=true) {
     let filePath = `cache/${fileName}-cache.json`;
     await mkDir(filePath);
@@ -228,6 +270,12 @@ async function writeFile(fileName, writeArr, asStream=true) {
     }
 }
 
+/**
+ * A function to read in json arrays
+ * @param {string} fileName the path to a json file.
+ * @return {Object} Returns the parsed json file. 
+ *  Most use cases will return an Array<String>
+ */
 async function readFile(fileName) {
     const readFile = util.promisify(fs.readFile);
     let fileBytes = null;
@@ -241,13 +289,11 @@ async function readFile(fileName) {
     return JSON.parse(fileBytes);
 }
 
-function attachPromise(stream) {
-    return new Promise((resolve, reject) => {
-        stream.on("finish", () => { resolve(true); }); 
-        stream.on("error", reject);
-    });
-  }
-
+/**
+ * A helper function to download files.
+ * @param {string} url we want to download a file from.
+ * @param {_cliProgress.Bar} bar progress bar that will update based on download perf.
+ */
 async function downloadFile(url, bar) {
     let parts = url.substring(baseUrl.length).split('/');
     let fileName = parts[parts.length-1];
@@ -265,41 +311,12 @@ async function downloadFile(url, bar) {
     }
     bar.increment(1);
 }
-async function downloadFileOld(url, bar) {
-    let parts = url.substring(baseUrl.length).split('/');
-    let fileName = parts[parts.length-1];
-    let codeName =  parts[0];
-    let version  =  parts[1];
-    let arch     =  parts[2];
-    let filePath = `ipks/${codeName}/${version}/${arch}/${fileName}`;
-    try {
-        await mkDir(filePath);
-    } catch(e) {
-        console.error(e);
-    }
-    //console.log(filePath);
-    if (!fs.existsSync(filePath)) {
-        let file = fs.createWriteStream(filePath);
-        let filePromise = attachPromise(file);
-        //let request = await httpGet(url, file);
-        let request = http.get(url, function(response) {
-            if(response.status < 400) { 
-                response.pipe(file);
-            }
-        });
-        let requestPromise = attachPromise(request);
-        try {
-            await requestPromise;
-            request.end();
-            await filePromise;
-            file.end();
-        } catch(e) {
-            console.error(e);
-        }
-    }
-    bar.increment(1);
-}
 
+/**
+ * A function that downloads the ipk files you either requested or the web crawler built up.
+ * @param {Array<string>} fetchTheseIpks if you know which ipks you want ahead of time
+ *  you can specify it here and we won't build up a hierarchical list.
+ */
 async function InvokeIpkDownload(fetchTheseIpks=null) {
     let ipkFiles;
     if(Array.isArray(fetchTheseIpks)){
@@ -326,6 +343,18 @@ async function InvokeIpkDownload(fetchTheseIpks=null) {
     }
     bar1.stop();
 }
+
+/**
+ * A function that attaches promise semantics to a stream callback api.
+ * @param {stream} stream api that we want to convert the callback to a promise.
+ */
+function attachPromise(stream) {
+    return new Promise((resolve, reject) => {
+        stream.on("finish", () => { resolve(true); }); 
+        stream.on("error", reject);
+    });
+  }
+
 
 function promiseFromChildProcess(child) {
     return new Promise(function(resolve, reject) {
