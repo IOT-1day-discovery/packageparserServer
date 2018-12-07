@@ -27,6 +27,29 @@ namespace PackageParserWeb.Database
 
             return builder.Eq("_id", pe.Id());
         }
+
+        public static FilterDefinition<BsonDocument> filterByKey(string key)
+        {
+            var builder = Builders<BsonDocument>.Filter;
+
+            return builder.Eq("k", key);
+        }
+
+        public static FilterDefinition<IpkInfoDb> filterBIpkByipkName(string ipkName)
+        {
+            var builder = Builders<IpkInfoDb>.Filter;
+            return builder.ElemMatch(
+                e => e.descriptors[4], 
+                d => d.Equals(ipkName));
+        }
+
+        public static FilterDefinition<IpkInfoDb> filterBIpkBySha1(string sha1)
+        {
+            var builder = Builders<IpkInfoDb>.Filter;
+            return builder.ElemMatch(
+                e => e.files,
+                f => f.sha1 == sha1);
+        }
     }
 
     public static class DatabaseExtentions<T>

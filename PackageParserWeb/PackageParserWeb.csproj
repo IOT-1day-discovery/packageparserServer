@@ -39,6 +39,10 @@
     <Compile Include="Database\HashDb.cs" />
     <Compile Include="DataStructures\Models\HashEntry.cs" />
     <Compile Include="Database\HashExtentions.cs" />
+    <Compile Include="DataStructures\Models\IpkInfo.cs" />
+    <Compile Include="Database\IpkDb.cs" />
+    <Compile Include="Database\BinaryVariationsDb.cs" />
+    <Compile Include="DataStructures\Models\BinaryVariations.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Nancy">
