@@ -113,6 +113,23 @@ namespace FindUniquePackages
                                     select new { k = key, v = aDict[key] };
         }
 
+        public static void streamReadHelper(StreamReader rStream) {
+            string line = rStream.ReadLine();
+            if (String.IsNullOrEmpty(line))
+            {
+                return;
+            }
+            if (line.StartsWith("filepath"))
+            {
+                return;
+            }
+            string[] lines = line.Split(';');
+            BinaryInfo bi = new BinaryInfo(lines);
+            //binarySet.Add(bi);
+            //addToFileSystemMap(bi);
+            addToBinaryNameMap(bi);
+        }
+
 
         /// Main function that decompresses a xz file and serialized it 
         // into a json for mongodb storage.
@@ -123,25 +140,24 @@ namespace FindUniquePackages
                 Console.Write("syntax is ./FundUniquePackages.exe <file>.xz");
             }
             var fs = File.OpenRead(args[0]);
-            using (Stream zipStream = new XZStream(fs))
+            if (fs.Name.EndsWith(".xz"))
             {
-                using (StreamReader unzip = new StreamReader(zipStream))
+                using (Stream zipStream = new XZStream(fs))
                 {
-                    while (!unzip.EndOfStream)
+                    using (StreamReader unzip = new StreamReader(zipStream))
                     {
-                        string line = unzip.ReadLine();
-                        if (String.IsNullOrEmpty(line))
+                        while (!unzip.EndOfStream)
                         {
-                            continue;
+                            streamReadHelper(unzip);
                         }
-                        if(line.StartsWith("filepath")) {
-                            continue;
-                        }
-                        string[] lines = line.Split(';');
-                        BinaryInfo bi = new BinaryInfo(lines);
-                        //binarySet.Add(bi);
-                        //addToFileSystemMap(bi);
-                        addToBinaryNameMap(bi);
+                    }
+                }
+            } else {
+                using (StreamReader fsStream = new StreamReader(fs))
+                {
+                    while (!fsStream.EndOfStream)
+                    {
+                        streamReadHelper(fsStream);
                     }
                 }
             }
