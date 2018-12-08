@@ -454,7 +454,14 @@ async function extractIpk(ipkFile) {
         file.sha1 = hashes[i];
         returnObj.files[i] = file;
     }
-    returnObj.descriptors = ipkFile.split('/');
+    let descriptors = ipkFile.split('/');
+    returnObj.codeName =descriptors[1];
+    returnObj.osVersion =descriptors[2];
+    returnObj.arch = descriptors[3];
+    returnObj.fileName = descriptors[4];
+    returnObj.pkgSha1 = await checksumFile('sha1',ipkFile);
+    returnObj.pkgSha256 = await checksumFile('sha256',ipkFile);
+    returnObj.pkgmd5 = await checksumFile('md5',ipkFile);
     //await run(`rm -rf ${extractedDir} `);
     //console.log(returnObj);
     return returnObj;
@@ -480,7 +487,7 @@ async function walkAndComputeHashes() {
     let countFail = 0;
     let countSucceed = 0;
     let hashobj = null;
-    filepaths = []
+    let filepaths = []
     let actionLambda = (ipkFilePath) => {
         filepaths.push(ipkFilePath);
         bar1.increment(1);

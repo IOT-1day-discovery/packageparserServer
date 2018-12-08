@@ -10,30 +10,20 @@ namespace FindUniquePackages
     /// </summary>
     public class BinaryInfo
     {
+        [JsonIgnore]
+        public readonly String keyValue;
         public readonly String filepath;
-        [JsonIgnore]
         public readonly String machine;
-        [JsonIgnore]
         public readonly String buildid_hashf;
-        [JsonIgnore]
         public readonly String linkage;
-        [JsonIgnore]
         public readonly String osversion;
-        [JsonIgnore]
         public readonly String stripped;
-        [JsonIgnore]
         public readonly String elftype;
-        [JsonIgnore]
         public readonly String buildid_hash;
-        [JsonIgnore]
         public readonly String interpreter;
-        [JsonIgnore]
         public readonly String abiversion;
-        [JsonIgnore]
         public readonly String osabi;
-        [JsonIgnore]
         public readonly String endian;
-        [JsonIgnore]
         public readonly String bits;
         [JsonProperty("sha1")]
         public readonly String file_sha1;
@@ -56,6 +46,7 @@ namespace FindUniquePackages
             endian = initArr[11];
             bits = initArr[12];
             file_sha1 = initArr[13];
+            keyValue = initArr[14];
         }
         /// <summary>
         /// a hashcode override that uses the sha1 string.

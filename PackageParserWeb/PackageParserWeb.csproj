@@ -43,6 +43,7 @@
     <Compile Include="Database\IpkDb.cs" />
     <Compile Include="Database\BinaryVariationsDb.cs" />
     <Compile Include="DataStructures\Models\BinaryVariations.cs" />
+    <Compile Include="Database\FileSysDb.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Nancy">

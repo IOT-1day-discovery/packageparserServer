@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Nancy;
 using Nancy.ModelBinding;
 using PackageParserWeb.Database;
@@ -60,7 +61,7 @@ namespace PackageParserWeb.Modules
                 string hash = parameters.hash;
                 try
                 {
-                    var ipk = IpkDb.Instance.findPackageBySha1Async(hash);
+                    IpkInfoDb ipk = IpkDb.Instance.findPackageBySha1Async(hash).Result;
                     if (ipk != null)
                     {
                         return Response.AsJson(ipk);
@@ -74,7 +75,7 @@ namespace PackageParserWeb.Modules
             {
                 string name = parameters.name;
                 try{
-                    var binaries = BinaryVariationsDb.Instance.findBinaryByName(name);
+                    BinaryVariationsDbEntry binaries = BinaryVariationsDb.Instance.findBinaryByName(name).Result;
                     if (binaries != null)
                     {
                         return Response.AsJson(binaries);
@@ -84,6 +85,20 @@ namespace PackageParserWeb.Modules
                     Console.WriteLine(e);
                 }
                 return Response.AsJson("{Entries: 0}");
+            };
+            Get["match/{fsKey}"] = parameters =>
+            {
+                string fsKey = parameters.fsKey;
+                BinaryVariationsDbEntry iotFileSystem = FileSysDb.Instance.findFileSystemByKey(fsKey).Result;
+                List<IpkInfoDb> ipkinfos = new List<IpkInfoDb>();
+                foreach (var file in iotFileSystem.v) {
+                    IpkInfoDb ipk = IpkDb.Instance.findPackageBySha1Async(file.sha1).Result;
+                    if(ipk != null) {
+                        ipkinfos.Add(ipk);
+                    }
+                }
+                return Response.AsJson(ipkinfos);
+
             };
         }
     }

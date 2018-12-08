@@ -6,14 +6,14 @@ using PackageParserWeb.DataStructures.Models;
 
 namespace PackageParserWeb.Database
 {
-    public class BinaryVariationsDb : MongoDbBase
+    public class FileSysDb : MongoDbBase
     {
         IMongoCollection<BsonDocument> m_BinaryVaryCollection;
-        protected const string sDatabaseCollectionType = "BinaryVariations";
+        protected const string sDatabaseCollectionType = "FileSystemBinaries";
 
-        private static readonly Lazy<BinaryVariationsDb> _mongoDbInstance = new Lazy<BinaryVariationsDb>(() => new BinaryVariationsDb());
+        private static readonly Lazy<FileSysDb> _mongoDbInstance = new Lazy<FileSysDb>(() => new FileSysDb());
 
-        public static BinaryVariationsDb Instance
+        public static FileSysDb Instance
         {
             get
             {
@@ -21,14 +21,14 @@ namespace PackageParserWeb.Database
             }
         }
 
-        private BinaryVariationsDb() : base()
+        private FileSysDb() : base()
         {
             m_BinaryVaryCollection = m_database.GetCollection<BsonDocument>(sDatabaseCollectionType);
         }
 
-        public async Task<BinaryVariationsDbEntry> findBinaryByName(string name)
+        public async Task<BinaryVariationsDbEntry> findFileSystemByKey(string key)
         {
-            var found = await m_BinaryVaryCollection.FindAsync(HashExtentions.filterByKey(name));
+            var found = await m_BinaryVaryCollection.FindAsync(HashExtentions.filterByKey(key));
             if (found != null)
             {
                 return DatabaseExtentions<BinaryVariationsDbEntry>.Deserialize(found.FirstOrDefault());

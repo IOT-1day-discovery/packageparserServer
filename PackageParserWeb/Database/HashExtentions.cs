@@ -38,9 +38,7 @@ namespace PackageParserWeb.Database
         public static FilterDefinition<IpkInfoDb> filterBIpkByipkName(string ipkName)
         {
             var builder = Builders<IpkInfoDb>.Filter;
-            return builder.ElemMatch(
-                e => e.descriptors[4], 
-                d => d.Equals(ipkName));
+            return builder.Eq("fileName", ipkName);
         }
 
         public static FilterDefinition<IpkInfoDb> filterBIpkBySha1(string sha1)

@@ -22,24 +22,15 @@ namespace FindUniquePackages
         /// </summary>
         public static void addToFileSystemMap(BinaryInfo bi)
         {
-            int indexOfSlash = bi.filepath.IndexOf('/');
-            int indexOfDot = bi.filepath.IndexOf('.');
-            int endIndex = indexOfDot;
-            int delataDist = (endIndex - indexOfSlash) - 1;
-            if (indexOfDot == -1 || delataDist > 41) {
-                endIndex = bi.filepath.IndexOf('/', indexOfSlash + 1);
-            }
-            string fileSystemName = bi.filepath.Substring(indexOfSlash+1, (endIndex - indexOfSlash)-1);
-            fileSystemName = fileSystemName.TrimStart('_');
             List<BinaryInfo> binaries;
-            if (filesystemToBinaryInfo.TryGetValue(fileSystemName, out binaries))
+            if (filesystemToBinaryInfo.TryGetValue(bi.keyValue, out binaries))
             {
                 binaries.Add(bi);
             }
             else
             {
                 binaries = new List<BinaryInfo>() { bi };
-                filesystemToBinaryInfo.Add(fileSystemName, binaries);
+                filesystemToBinaryInfo.Add(bi.keyValue, binaries);
             }
         }
 
@@ -126,7 +117,7 @@ namespace FindUniquePackages
             string[] lines = line.Split(';');
             BinaryInfo bi = new BinaryInfo(lines);
             //binarySet.Add(bi);
-            //addToFileSystemMap(bi);
+            addToFileSystemMap(bi);
             addToBinaryNameMap(bi);
         }
 
@@ -161,7 +152,7 @@ namespace FindUniquePackages
                     }
                 }
             }
-            //File.WriteAllText("FileSystemBinaries.json", JsonConvert.SerializeObject(serializationTransform(filesystemToBinaryInfo)));
+            File.WriteAllText("FileSystemBinaries.json", JsonConvert.SerializeObject(serializationTransform(filesystemToBinaryInfo)));
             File.WriteAllText("BinaryVariations.json", JsonConvert.SerializeObject(serializationTransform(binaryNameToBinaryInfo)));
             //File.WriteAllText("SimilarityArray.json", generateSimilarityMatrix());
         }
