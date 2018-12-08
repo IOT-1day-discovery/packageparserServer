@@ -129,6 +129,7 @@ namespace FindUniquePackages
             if (args.Length != 1)
             {
                 Console.Write("syntax is ./FundUniquePackages.exe <file>.xz");
+                return;
             }
             var fs = File.OpenRead(args[0]);
             if (fs.Name.EndsWith(".xz"))
