@@ -37,6 +37,15 @@ namespace PackageParserWeb.Database
             Sha256Db.Instance.AddHashAsync(package.Sha256, id);
         }
 
+        public PackageEntry findPackageByFileName(string fileName) {
+            var found = m_Packagecollection.FindAsync(HashExtentions.filterByFileName(fileName)).Result.FirstOrDefault();
+            if (found != null)
+            {
+                return DatabaseExtentions<PackageEntryDb>.Deserialize(found);
+            }
+            return null;
+        }
+
         public async Task<PackageEntry> findPackageByIdAsync(ObjectId id)
         {
             var found = await m_Packagecollection.FindAsync(HashExtentions.filterById(id)).Result.FirstOrDefaultAsync();

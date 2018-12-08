@@ -565,8 +565,8 @@ const walkFs = (dir, actionFunc=null, filelist = []) => {
  * Entrypoint for fetch.js
  */
 async function downloadAndComputeHashes() {
-    await InvokeIpkDownload();
-    //InvokeIpkDownload(['barrier_breaker/14.07/ramips/rt3883/packages/packages/']);
+    //await InvokeIpkDownload();
+    await InvokeIpkDownload(['barrier_breaker/14.07/ramips/rt288x/packages/packages/']);
     walkAndComputeHashes();
 }
 

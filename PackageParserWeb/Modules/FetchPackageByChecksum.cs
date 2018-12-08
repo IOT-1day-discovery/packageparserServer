@@ -38,6 +38,16 @@ namespace PackageParserWeb.Modules
                 }
                 return Response.AsJson("{Entries: 0}");
             };
+            Get["package/name/{fileName}"] = parameters =>
+            {
+                string fileName = parameters.fileName;
+                var package = PackageDb.Instance.findPackageByFileName(fileName);
+                if (package != null)
+                {
+                    return Response.AsJson(package);
+                }
+                return Response.AsJson("{Entries: 0}");
+            };
 
             Get["binary/ipkNames/{ipkName}"] = parameters =>
             {

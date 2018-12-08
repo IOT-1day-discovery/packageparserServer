@@ -14,6 +14,11 @@ namespace PackageParserWeb.Database
             return builder.Eq("hash", hash);
         }
 
+        public static FilterDefinition<BsonDocument> filterByFileName(string fileName) {
+            var builder = Builders<BsonDocument>.Filter;
+            return builder.Eq("Filename", fileName);
+        }
+
         public static FilterDefinition<BsonDocument> filterById(ObjectId id)
         {
             var builder = Builders<BsonDocument>.Filter;
