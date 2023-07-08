@@ -13,7 +13,7 @@
     "cli-progress": "^2.1.0",
     "docdash": "^1.0.1",
     "jsdoc": "^3.6.11",
-    "tabletojson": "^0.9.8",
+    "tabletojson": "^2.0.7",
     "tar-stream": "^1.6.2"
   }
 }
